@@ -1,0 +1,7 @@
+-- Count the number of dorian points in each county
+-- Count the number of november points in each county
+-- Set counties with no points to 0 for the november count
+-- Calculate the normalized difference tweet index (made this up, based on NDVI), where
+-- ndti = (tweets about storm – baseline twitter activity) / (tweets about storm + baseline twitter activity)
+-- remember to multiply something by 1.0 so that you'll get decimal devision, not integer division
+-- also if the denominator would end up being 0, set the result to 0
