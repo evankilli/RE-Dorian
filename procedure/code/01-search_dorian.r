@@ -52,7 +52,7 @@ november <- search_tweets("-filter:verified OR filter:verified", n=200000, inclu
 # then run the following line of code to load the data into your environment
 
 install.packages("tidyverse")
-load(here("documents", "GitHub", "evankilli.github.io", "RE-Dorian", "data","derived","private","dorian.RData"))
+load(here("data","derived","private","dorian.RData"))
 
 # In the following code, you can practice running the queries on dorian3
 
