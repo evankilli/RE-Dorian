@@ -36,21 +36,21 @@ library(tidyverse)
 # this should launch a web browser and ask you to log in to twitter
 # for authentication of access_token and access_secret
 twitter_token = create_token(
-  app = "",                     #enter your app name in quotes
-  consumer_key = "",  		      #enter your consumer key in quotes
-  consumer_secret = "",         #enter your consumer secret in quotes
-  access_token = NULL,
-  access_secret = NULL
+  app = "evankilli.lab",                     #enter your app name in quotes
+  consumer_key = "q26rOjeSCYE3XBvNsF7cDOXSN",  		      #enter your consumer key in quotes
+  consumer_secret = "Awuh2HBF0axd9RnephymXB4ETmMUQjRDcaPT6vl2W4cAo8gBCF",         #enter your consumer secret in quotes
+  access_token = "1288885695789051904-8fIYlqIlk4YqWzUl6HFAHuET5GvCtb",
+  access_secret = "rkj1WhXgoqsxkQDNARpAZ9rkWxM5fQsUq4UFa5wNm2aaD"
 )
 
 #get tweets for hurricane Dorian, searched on September 11, 2019
-dorian <- search_tweets("dorian OR hurricane OR sharpiegate", n=200000, include_rts=FALSE, token=twitter_token, geocode="32,-78,1000mi", retryonratelimit=TRUE)
+cinco <- search_tweets("cinco de mayo", n=50000, include_rts=FALSE, token=twitter_token, geocode="32,-78,1000mi", retryonratelimit=TRUE)
 
 
 #get tweets without any text filter for the same geographic region in November, searched on November 19, 2019
 #the query searches for all verified or unverified tweets, so essentially everything
-november <- search_tweets("-filter:verified OR filter:verified", n=200000, include_rts=FALSE, token=twitter_token, geocode="32,-78,1000mi", retryonratelimit=TRUE)
-
+current2 <- search_tweets("-filter:verified OR filter:verified", n=200000, include_rts=FALSE, token=twitter_token, geocode="32,-78,1000mi", retryonratelimit=TRUE)
+current <- readRDS(here("data", "derived", "private", "current.RDS"))
 
 ############# LOAD THESE RESULTS - GEOG323 STUDENTS ONLY #############
 
@@ -70,48 +70,47 @@ load(here("data","derived","private","dorian.RData"))
 #sample function: lat_lng(x, coords = c("coords_coords", "bbox_coords"))
 
 # list unique/distinct place types to check if you got them all
-unique(dorian$place_type)
+unique(cinco$place_type)
 
 # list and count unique place types
 # NA results included based on profile locations, not geotagging / geocoding.
 # If you have these, it indicates that you exhausted the more precise tweets
 # in your search parameters and are including locations based on user profiles
-load(here("data","derived","private","dorian_raw.RDS"))
-count(dorian_raw, place_type)
+count(cinco, place_type)
 
 # convert GPS coordinates into lat and lng columns
 # do not use geo_coords! Lat/Lng will be inverted
-dorian = lat_lng(dorian_raw, coords=c("coords_coords"))
-november = lat_lng(november, coords=c("coords_coords"))
+cinco = lat_lng(cinco, coords=c("coords_coords"))
+current = lat_lng(current, coords=c("coords_coords"))
 
 # select any tweets with lat and lng columns (from GPS) or
 # designated place types of your choosing
-dorian = subset(dorian,
+cinco = subset(cinco,
                 place_type == 'city'| place_type == 'neighborhood'|
                   place_type == 'poi' | !is.na(lat))
 
-november = subset(november,
+current = subset(current,
                   place_type == 'city'| place_type == 'neighborhood'|
                     place_type == 'poi' | !is.na(lat))
 
 # convert bounding boxes into centroids for lat and lng columns
-dorian = lat_lng(dorian,coords=c("bbox_coords"))
-november = lat_lng(november,coords=c("bbox_coords"))
+cinco = lat_lng(cinco,coords=c("bbox_coords"))
+current = lat_lng(current,coords=c("bbox_coords"))
 
 # re-check counts of place types
-count(dorian, place_type)
+count(cinco, place_type)
 
 ############# SAVE FILTERED TWEET IDS TO DATA/DERIVED/PUBLIC #############
 
-write.table(november$status_id,
-            here("data","derived","public","novemberids.txt"),
+write.table(current$status_id,
+            here("data","derived","public","currentids.txt"),
             append=FALSE, quote=FALSE, row.names = FALSE, col.names = FALSE)
 
-write.table(dorian$status_id,
-            here("data","derived","public","dorianids.txt"),
+write.table(cinco$status_id,
+            here("data","derived","public","cincoids.txt"),
             append=FALSE, quote=FALSE, row.names = FALSE, col.names = FALSE)
 
 ############# SAVE TWEETs TO DATA/DERIVED/PRIVATE #############
 
-saveRDS(dorian, here("data","derived","private","dorian.RDS"))
-saveRDS(november, here("data","derived","private","november.RDS"))
+saveRDS(cinco, here("data","derived","private","cinco.RDS"))
+saveRDS(current, here("data","derived","private","current.RDS"))

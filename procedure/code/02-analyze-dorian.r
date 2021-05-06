@@ -1,4 +1,4 @@
-# Analyze Hurricane Dorian Twitter data, by Joseph Holler, 2019
+# Analyze Hurricane cinco Twitter data, by Joseph Holler, 2019
 # following tutorial at:
 # https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
 # also get advice from the rtweet page: https://rtweet.info/
@@ -30,30 +30,30 @@ library(here)
 
 #create temporal data frame & graph it
 
-dorianByHour <- ts_data(dorian3, by="hours")
-ts_plot(dorian3, by="hours")
+cincoByHour <- ts_data(cinco, by="hours")
+ts_plot(cinco, by="hours")
 
 
 ############# NETWORK ANALYSIS #############
 
 # Create network data frame.
 # Other options for 'edges' in the network include mention, retweet, and reply
-dorianNetwork <- network_graph(dorian, c("quote"))
+cincoNetwork <- network_graph(cinco, c("quote"))
 
-plot.igraph(dorianNetwork)
+plot.igraph(cincoNetwork)
 # This graph needs serious work... e.g. subset to a single state maybe?
 
 
 ############# TEXT / CONTEXTUAL ANALYSIS #############
 
 # remove urls, fancy formatting, etc. in other words, clean the text content
-dorianText = dorian %>% select(text) %>% plain_tweets()
+cincoText = cinco %>% select(text) %>% plain_tweets()
 
 # parse out words from tweet text
-dorianWords = dorianText %>% unnest_tokens(word, text)
+cincoWords = cincoText %>% unnest_tokens(word, text)
 
 # how many words do you have including the stop words?
-count(dorianWords)
+count(cincoWords)
 
 # create list of stop words (useless words not worth analyzing)
 data("stop_words")
@@ -62,18 +62,16 @@ data("stop_words")
 # also add the twitter search terms to the list
 stop_words = stop_words %>%
   add_row(word="t.co",lexicon = "SMART") %>%
-  add_row(word="hurricane",lexicon = "Search") %>%
-  add_row(word="dorian",lexicon = "Search") %>%
-  add_row(word="sharpiegate",lexicon = "Search")
+  add_row(word="cinco de mayo",lexicon = "Search")
 
-#delete stop words from dorianWords with an anti_join
-dorianWords =  dorianWords %>% anti_join(stop_words)
+#delete stop words from cincoWords with an anti_join
+cincoWords =  cincoWords %>% anti_join(stop_words)
 
 # how many words after removing the stop words?
-count(dorianWords)
+count(cincoWords)
 
 # graph frequencies of words
-dorianWords %>%
+cincoWords %>%
   count(word, sort = TRUE) %>%
   top_n(15) %>%
   mutate(word = reorder(word, n)) %>%
@@ -86,7 +84,7 @@ dorianWords %>%
        title = "Count of unique words found in tweets")
 
 # separate words and count frequency of word pair occurrence in tweets
-dorianWordPairs = dorianText %>%
+cincoWordPairs = cincoText %>%
   mutate(text = removeWords(tolower(text), stop_words$word)) %>%
   unnest_tokens(paired_words, text, token = "ngrams", n = 2) %>%
   separate(paired_words, c("word1", "word2"),sep=" ") %>%
@@ -94,14 +92,14 @@ dorianWordPairs = dorianText %>%
 
 # graph a word cloud with space indicating association.
 # you may change the filter to filter more or less than pairs with 30 instances
-dorianWordPairs %>%
+cincoWordPairs %>%
   filter(n >= 25 & !is.na(word1) & !is.na(word2)) %>%
   graph_from_data_frame() %>%
   ggraph(layout = "fr") +
   geom_edge_link(aes(edge_alpha = n, edge_width = n)) +
   geom_node_point(color = "darkslategray4", size = 3) +
   geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
-  labs(title = "Word Network of Tweets during Hurricane Dorian",
+  labs(title = "Word Network of Tweets during Cinco de Mayo",
        x = "", y = "") +
   theme_void()
 
@@ -115,7 +113,7 @@ counties <- get_estimates("county",
                           product="population",
                           output="wide",
                           geometry=TRUE, keep_geo_vars=TRUE,
-                          key="yourkey")
+                          key="716ad454886b399713614499a97770ff15e69981")
 
 # select only the states you want, with FIPS state codes
 # look up fips codes here:
@@ -140,9 +138,9 @@ ggplot() +
   geom_sf(data=counties, aes(fill=cut_number(DENSITY,5)), color="grey")+
   scale_fill_brewer(palette="GnBu")+
   guides(fill=guide_legend(title="Population Density"))+
-  geom_point(data = dorian, aes(x=lng,y=lat),
+  geom_point(data = cinco, aes(x=lng,y=lat),
              colour = 'purple', alpha = .2) +
-  labs(title = "Tweet Locations During Hurricane Dorian")+
+  labs(title = "Tweet Locations During Cinco de Mayo")+
   theme(plot.title=element_text(hjust=0.5),
         axis.title.x=element_blank(),
         axis.title.y=element_blank())
@@ -163,11 +161,11 @@ con <- dbConnect(RPostgres::Postgres(),
 dbListTables(con)
 
 #create a simple table for uploading
-doriansql <- select(dorian,c("user_id","status_id","text","lat","lng"),
+cincosql <- select(cinco,c("user_id","status_id","text","lat","lng"),
                     starts_with("place"))
 
 #write data to the database
-dbWriteTable(con,'dorian',doriansql, overwrite=TRUE)
+dbWriteTable(con,'cinco',cincosql, overwrite=TRUE)
 
 # try also writing the november tweet data to the database! Add code below:
 
@@ -175,9 +173,9 @@ novembersql <- select(november,c("user_id","status_id","text","lat","lng"),start
 dbWriteTable(con,'november',novembersql, overwrite=TRUE)
 
 # SQL to add geometry column of type point and crs NAD 1983:
-# SELECT AddGeometryColumn ('schemaname','dorian','geom',4269,'POINT',2, false);
+# SELECT AddGeometryColumn ('schemaname','cinco','geom',4269,'POINT',2, false);
 # SQL to calculate geometry:
-# UPDATE dorian set geom = st_transform(st_makepoint(lng,lat),4326,4269);
+# UPDATE cinco set geom = st_transform(st_makepoint(lng,lat),4326,4269);
 
 #make all lower-case names for counties, because PostGreSQL is not into capitalization
 # write counties table with lower-case column names to the database
@@ -189,7 +187,7 @@ dbWriteTable(con,'counties',lownames(counties), overwrite=TRUE)
 
 # Either in R or in PostGIS (via QGIS DB Manager)...
 
-# Count the number of dorian points in each county
+# Count the number of cinco points in each county
 # Count the number of november points in each county
 # Set counties with no points to 0 for the november count
 # Calculate the normalized difference tweet index (made this up, based on NDVI),
@@ -201,7 +199,7 @@ dbWriteTable(con,'counties',lownames(counties), overwrite=TRUE)
 # See 03-spatial-join.sql for tips on managing the data in PostGIS
 
 # Either in QGIS or in R...
-# Map the normalized tweet difference index for Hurricane Dorian
+# Map the normalized tweet difference index for Hurricane cinco
 # Try using the heatmap symbology in QGIS to visualize kernel density of tweets
 
 

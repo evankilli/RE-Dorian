@@ -1,4 +1,4 @@
-## Spatial Clustering Analysis for Hurricane Dorian Twitter Analysis
+## Spatial Clustering Analysis for Hurricane cinco Twitter Analysis
 # Code by Joseph Holler (2021) and Casey Lilley (2019)
 
 packages = c("dplyr", "tidyr", "here", "spdep", "sf", "ggplot2")
@@ -18,46 +18,46 @@ library(ggplot2)
 # This section may not be necessary if you have already spatially joined
 # and calculated normalized tweet rates in PostGIS
 
-# load dorian and november data if not already loaded
-dorian = readRDS(here("data","derived","private","dorian.RDS"))
-november = readRDS(here("data","derived","private","november.RDS"))
+# load cinco and current data if not already loaded
+cinco = readRDS(here("data","derived","private","cinco.RDS"))
+current = readRDS(here("data","derived","private","current.RDS"))
 
-dorian_sf = dorian %>%
+cinco_sf = cinco %>%
   st_as_sf(coords = c("lng","lat"), crs=4326) %>%  # make point geometries
   st_transform(4269) %>%  # transform to NAD 1983
   st_join(select(counties,GEOID))  # spatially join counties to each tweet
 
-dorian_by_county = dorian_sf %>%
+cinco_by_county = cinco_sf %>%
   st_drop_geometry() %>%   # drop geometry / make simple table
   group_by(GEOID) %>%      # group by county using GEOID
-  summarise(dorian = n())  # count # of tweets
+  summarise(cinco = n())  # count # of tweets
 
 counties = counties %>%
-  left_join(dorian_by_county, by="GEOID") %>% # join count of tweets to counties
-  mutate(dorian = replace_na(dorian,0))       # replace nulls with 0's
+  left_join(cinco_by_county, by="GEOID") %>% # join count of tweets to counties
+  mutate(cinco = replace_na(cinco,0))       # replace nulls with 0's
 
-rm(dorian_by_county)
+rm(cinco_by_county)
 
-# Repeat the workflow above for tweets in November
+# Repeat the workflow above for tweets in current
 
-nov_by_county = november %>% 
+current_by_county = current %>% 
   st_as_sf(coords = c("lng","lat"), crs=4326) %>%
   st_transform(4269) %>%
   st_join(select(counties,GEOID)) %>%
   st_drop_geometry() %>%
   group_by(GEOID) %>% 
-  summarise(nov = n())
+  summarise(current = n())
 
 counties = counties %>%
-  left_join(nov_by_county, by="GEOID") %>%
-  mutate(nov = replace_na(nov,0))
+  left_join(current_by_county, by="GEOID") %>%
+  mutate(current = replace_na(current,0))
 
 counties = counties %>%
-  mutate(dorrate = dorian / POP * 10000) %>%  # dorrate is tweets per 10,000
-  mutate(ntdi = (dorian - nov) / (dorian + nov)) %>%  # normalized tweet diff
+  mutate(cincorate = cinco / POP * 10000) %>%  # dorrate is tweets per 10,000
+  mutate(ntdi = (cinco - current) / (cinco + current)) %>%  # normalized tweet diff
   mutate(ntdi = replace_na(ntdi,0))   # replace NULLs with 0's
 
-rm(nov_by_county)
+rm(current_by_county)
 
 # save counties geographic data with derived tweet rates
 saveRDS(counties,here("data","derived","public","counties_tweet_counts.RDS"))
@@ -87,7 +87,7 @@ dwm = nb2listw(thresdist, zero.policy = T)
 
 ######## Local G* Hotspot Analysis ######## 
 #Get Ord G* statistic for hot and cold spots
-counties$locG = as.vector(localG(counties$dorrate, listw = dwm, 
+counties$locG = as.vector(localG(counties$cincorate, listw = dwm, 
                                  zero.policy = TRUE))
 
 # optional step to check summary statistics of the local G score
@@ -124,7 +124,7 @@ ggplot() +
     aesthetics = "fill"
   ) +
   guides(fill=guide_legend(title="Hot Spots"))+
-  labs(title = "Clusters of Hurricane Dorian Twitter Activity")+
+  labs(title = "Clusters of Cinco de Mayo Twitter Activity")+
   theme(plot.title=element_text(hjust=0.5),
         axis.title.x=element_blank(),
         axis.title.y=element_blank())
