@@ -13,6 +13,7 @@ library(rtweet)
 library(here)
 library(dplyr)
 library(rehydratoR)
+library(tidyverse)
 
 ############# SEARCH TWITTER API #############
 
@@ -75,6 +76,7 @@ unique(dorian$place_type)
 # NA results included based on profile locations, not geotagging / geocoding.
 # If you have these, it indicates that you exhausted the more precise tweets
 # in your search parameters and are including locations based on user profiles
+load(here("data","derived","private","dorian_raw.RDS"))
 count(dorian_raw, place_type)
 
 # convert GPS coordinates into lat and lng columns

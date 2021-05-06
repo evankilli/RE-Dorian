@@ -1,7 +1,7 @@
 #search geographic twitter data for Hurricane Dorian, by Joseph Holler, 2019,2020
 #to search, you first need a twitter API token: https://rtweet.info/articles/auth.html 
 
-#this script contains the code that was used to create the dorian and november data frames in dorian.Rdata. 
+#this script contains the code that was used to create the dorian and current data frames in dorian.Rdata. 
 #note that this code will no longer work as originally run, because the code is time-sensitive.
 #for students in GG323, read the code for how the data was searched, and then run the final block
 #of code to download and load the resutls in Rdata format.
@@ -29,20 +29,20 @@ library(here)
 #this should launch a web browser and ask you to log in to twitter
 #replace app, consumer_key, and consumer_secret data with your own developer acct info
 twitter_token <- create_token(
-  app = "yourapp",  					#replace yourapp with your app name
-  consumer_key = "yourkey",  		#replace yourkey with your consumer key
-  consumer_secret = "yoursecret",  #replace yoursecret with your consumer secret
-  access_token = NULL,
-  access_secret = NULL
+  app = "evankilli.lab",  					#replace yourapp with your app name
+  consumer_key = "q26rOjeSCYE3XBvNsF7cDOXSN",  		#replace yourkey with your consumer key
+  consumer_secret = "Awuh2HBF0axd9RnephymXB4ETmMUQjRDcaPT6vl2W4cAo8gBCF",  #replace yoursecret with your consumer secret
+  access_token = "1288885695789051904-8fIYlqIlk4YqWzUl6HFAHuET5GvCtb",
+  access_secret = "rkj1WhXgoqsxkQDNARpAZ9rkWxM5fQsUq4UFa5wNm2aaD"
 )
 
-#get tweets for hurricane Dorian, searched on September 11, 2019
-dorian <- search_tweets("dorian OR hurricane OR sharpiegate", n=200000, include_rts=FALSE, token=twitter_token, geocode="32,-78,1000mi", retryonratelimit=TRUE)
+#get tweets for TOPIC , searched on May 5, 2021
+removetrump <- search_tweets("#RemoveTrumpJack", n=50000, include_rts=FALSE, token=twitter_token, geocode="41,-96,1500mi", retryonratelimit=TRUE)
 
 
-#get tweets without any text filter for the same geographic region in November, searched on November 19, 2019
+#get tweets without any text filter for the same geographic region in April-Mau, searched on May 5, 2021
 #the query searches for all verified or unverified tweets, so essentially everything
-november <- search_tweets("-filter:verified OR filter:verified", n=200000, include_rts=FALSE, token=twitter_token, geocode="32,-78,1000mi", retryonratelimit=TRUE)
+current <- search_tweets("-filter:verified OR filter:verified", n=50000, include_rts=FALSE, token=twitter_token, geocode="41,-96,1500mi", retryonratelimit=TRUE)
 
 
 ############# LOAD THESE RESULTS - GEOG323 STUDENTS ONLY ############# 
@@ -63,23 +63,23 @@ load(here("data","derived","private","dorian.RData"))
 #sample function: lat_lng(x, coords = c("coords_coords", "bbox_coords"))
 
 # list unique/distinct place types to check if you got them all
-unique(dorian$place_type)
+unique(removetrump$place_type)
 
 # list and count unique place types
 # NA results included based on profile locations, not geotagging / geocoding. If you have these, it indicates that you exhausted the more precise tweets in your search parameters
-count(dorian, place_type)
+count(removetrump, place_type)
 
 #convert GPS coordinates into lat and lng columns
 #do not use geo_coords! Lat/Lng will come out inverted
-dorian <- lat_lng(dorian,coords=c("coords_coords"))
-november <- lat_lng(november,coords=c("coords_coords"))
+removetrump <- lat_lng(removetrump,coords=c("coords_coords"))
+current <- lat_lng(current,coords=c("coords_coords"))
 
 #select any tweets with lat and lng columns (from GPS) or designated place types of your choosing
-dorian <- subset(dorian, place_type == 'city'| place_type == 'neighborhood'| place_type == 'poi' | !is.na(lat))
-november <- subset(november, place_type == 'city'| place_type == 'neighborhood'| place_type == 'poi' | !is.na(lat))
+removetrump <- subset(removetrump, place_type == 'city'| place_type == 'neighborhood'| place_type == 'poi' | !is.na(lat))
+current <- subset(current, place_type == 'city'| place_type == 'neighborhood'| place_type == 'poi' | !is.na(lat))
 
 #convert bounding boxes into centroids for lat and lng columns
-dorian <- lat_lng(dorian,coords=c("bbox_coords"))
-november <- lat_lng(november,coords=c("bbox_coords"))
+removetrump <- lat_lng(removetrump,coords=c("bbox_coords"))
+current <- lat_lng(current,coords=c("bbox_coords"))
 
 
