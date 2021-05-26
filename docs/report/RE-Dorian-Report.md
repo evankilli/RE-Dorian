@@ -56,31 +56,54 @@ A file containing status_id's for the Cinco de Mayo query are available [here](h
 
 The procedure used to conduct this analysis generally followed the workflows of both Wang et al and Holler, however a kernel density analysis was not used for this study, instead finding Getis-Ord G scores for the counties within the study region and then mapping those scores as relative "cold" and "hot" spots, with low and high relative densities of tweets relating to Cindo de Mayo. Additionally, network analysis was not conducted, following the methods used by Holler in his study of Hurrican Dorian. Code run in RStudio to conduct the analysis (with '_cinco' appended to the end of the file name) is provided [here](https://github.com/evankilli/RE-Dorian/tree/main/procedure/code).
 
-## Replication Results
+## Replication Results and Discussion
 
-### Temporal analysis
+### Temporal Analysis
 
+![Temporal Analysis of Cinco de Mayo Twitter Activity](blogs/content/RE-Dorian/tweetsbyhour_cinco.png)
 
+As would be expected, Twitter activity shows a pronounced peak in tweets related to Cinco de Mayo, with little mention of the holiday before it occurs. Some gradual increase in tweet frequency does appear in this analysis, likely attributed to anxiously excited party goers, but the bulk of activity related to Cinco de Mayo occurs during the later part of May 5th through to the very beginning of May 6th. As it took place on a Wednesday this year (2021), many would-be celebrants were working either in-person or remotely, likely contributing to this later spike in activity which corresponds well to dinners and after-dinner parties. This largely follows the pattern identified by Wang et al, with Twitter activity closely corresponding to the event studied, though the lack of a hazard seems to have allowed users to tweet closer to events than in the wildfire events studied by Wang et al.
 
-- temporal analysis graph
-- content analysis graph
-- map of twitter activity
-- hot spot analysis
+### Content Analysis
+
+![Counts of unique words in Cinco de Mayo tweets](blogs/content/RE-Dorian/wordfreq_cinco.png)
+
+Unsurprisingly, content analyses of the collected tweets found that by far, "de", "cinco", and "mayo" were the most tweeted words. Interestingly, however, "cinco" and "de" pull out ahead of "mayo", perhaps due to jokes like "Cinco de Drinko". "Happy" and "feliz" show up in the top 15, likely attibuted to holiday well wishers, and Mexican food and drink items like "tacos", "tequila", and "margaritas" likewise end up in this list due to their prevalence in US Mexican cuisine.
+
+![Plot of word pairs in Cinco de Mayo tweets](blogs/content/RE-Dorian/wordnetwork_cinco.png)
+
+An additional analysis, this time of word pairings in tweets, backs up the idea that jokes like "Cinco de Drinko" are contributing to "mayo's" somewhat lower prevalence in tweets. As seen above, "cinco" and "de" are tweeted together significantly more often the "de" and "mayo". "Mexican" shows up often in conjunction with "army", "restaurant", and "independence" - a misconception, as it celebrates a victory over the French *post-independence* - as well as "battle" and "puebla", connected to the actual battle that is actually commemorated on Cinco de Mayo.
+
+### Spatial Analysis
+
+![Map of tweet locations and population density](blogs/content/RE-Dorian/tweetloc_cinco.png)
+![Hot spots of Cinco de Mayo twitter activity](blogs/content/RE-Dorian/hotspots_cinco.png)
+
+As expected, the first map shows that the distribution of tweets about Cinco de Mayo broadly map onto population density, with most tweets being in population centers throughout the study region. Looking more deeply, however, the second map of normalized "hotspots" of twitter activity shows some interesting patterns. Six primary "hotspots" appear in this map: metropolitan South Florida, Orlando, the urbanized Northeast, metro Atlanta, southern Louisiana, and the western parts of North Carolina. The first four are fairly immediately explainable; they're all large metropolises, all with substantial Latino populations, as seen in the map below, from Social Explorer.
+
+![Hispanic population by county](blogs/content/RE-Dorian/hispanicpop.png)
+
+Southern Louisiana and North Carolina provide interesting cases, however, as neither has a particularly significant Latino population. North Carolina remains an enigma, especially due to the rural nature of many of the counties that show up as "hotspots" and the fairly low percentage of Latino residents, but southern Louisiana could in this case be potentially buoyed by New Orleans's reputation as a party center, though their fairly wide reach of this "hotspot" remains intriguing.
+
+Unsurprisingly, "cold" spots largely consisted of parts of Appalachia and the rural midwest, places without a critical mass of Latino residents or party- and club-goers.
+
+With the exception of the two final examples of hotspots, the patterns detected in this analysis largely follow the expectations set up by Wang et al and Holler, with hotspots largely concentrated in areas where the events studied may be a bit more prevalent.
 
 ## Unplanned Deviations from the Protocol
 
-Summarize changes and uncertainties between
-- your expectation of a reproduction workflow based on the reading and Dorian analysis
-- your final workflow after completing the lab
+Due to the nature of the Twitter API and their use of a radius, paired with the county-based information found via the US Census Bureau's API, the queries did not exactly line up, and some tweets ended up outside the study area, particularly on the western edge of the region. Thus, not all tweets ended up being joined to counties and studied in the spatial analysis.
 
-## Discussion
+Additionally, a network analysis is not included here. An analysis was performed in R, but the graphic was rendered in a nearly unusable state, and was not included here.
 
-Provide a summary and interpretation of your key findings in relation to your research question. Mention if findings confirm or contradict patterns observed by Wang et al (2016) or by Holler (2
+Otherwise, this study barely diverged from the procedure provided by Holler, again available [here](https://github.com/evankilli/RE-Dorian/tree/main/procedure/code).
 
 ## Conclusion
 
-Restate the key findings and discuss their broader societal implications or contributions to theory.
-Do the research findings suggest a need for any future research?
+This study, investigating Twitter activity surrounding Cinco de Mayo, found broadly the same patterns as those found by Wang et al and Holler, namely that:
+  1. temporal patterns of activity were closely tied to events, largely occurring within the 24hrs following a hazardous event; this study found minimal lag in activity, likely due to lack of hazards.
+  1. spatial patterns tended to coincide with areas effected by events, with many metropolitan areas with significant Latino populations ranking as "hotspots" in this study
+
+Additionally, content of users tweets largely lined up with activities for the holiday. The name of the holiday, separated or strung together in one "word" ranked highest, but Mexican foodstuffs like tacos, margaritas, and tequila - the foods of choice for celebrants at Mexican restaurants across the country - also found their way into the list of most used terms. While this doesn't *cleanly* map on to Wang et al and Hollers findings, which found interest in responses to disasters in dissemination of information, the clear relevance of associated actions, whether dinner and drinks or evacuation, does carry throughout the three studies. 
 
 ## References
 
